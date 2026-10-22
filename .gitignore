@@ -1,0 +1,18 @@
+# Binários de compilação
+main
+*.o
+
+# Ambiente virtual do Python
+venv/
+.venv/
+__pycache__/
+
+# Resultados gerados pelo benchmark e pela análise
+resultados/
+saida/
+
+# Configurações de editor
+.vscode/
+
+# Metadados do Windows (arquivos baixados no WSL)
+*:Zone.Identifier
