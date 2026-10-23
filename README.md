@@ -21,6 +21,8 @@ Tamanhos testados: 1.000, 2.000, 5.000, 10.000, 20.000, 50.000, 100.000, 200.000
 ├── analise.py        # estatísticas, tabelas, gráficos e regressões
 ├── Makefile
 ├── requirements.txt  # dependências do Python
+├── docs/             # relatório (LaTeX/abnTeX2): relatorio.tex, referencias.bib,
+│                     # gerar_recursos.py e recursos/ (figuras e tabelas geradas)
 ├── resultados/       # CSVs brutos gerados pelo ./main (não versionado)
 └── saida/            # tabelas e gráficos gerados pelo analise.py (não versionado)
 ```
@@ -56,3 +58,12 @@ Os resultados são gravados na pasta `saida/`:
 - `regressoes.csv`: ajuste polinomial (graus 1, 2 e 3) com R²
 
 As opções da análise (quais tabelas e gráficos gerar) ficam no bloco de configuração no topo do `analise.py`.
+
+### 3. Relatório (LaTeX)
+
+```bash
+venv/bin/python docs/gerar_recursos.py   # figuras e tabelas em docs/recursos/
+cd docs && latexmk -pdf relatorio.tex    # gera docs/relatorio.pdf
+```
+
+Requer TeX Live com abnTeX2 (`texlive-publishers`). Sempre que novos CSVs forem gerados, rode o `gerar_recursos.py` de novo antes de compilar.

@@ -1,0 +1,16 @@
+\begin{tabular}{l S[table-format=1.2] S[table-format=1.2] S[table-format=1.2] S[table-format=1.2] S[table-format=1.2] S[table-format=1.2] }
+\toprule
+ & \multicolumn{3}{c}{Insertion Sort} & \multicolumn{3}{c}{Merge Sort} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+{$n \to 2n$} & {Melhor caso} & {Caso médio} & {Pior caso} & {Melhor caso} & {Caso médio} & {Pior caso} \\
+\midrule
+1.000 $\to$ 2.000 & 2.50 & 3.53 & 3.65 & 1.98 & 1.73 & 1.77 \\
+5.000 $\to$ 10.000 & 2.71 & 4.17 & 4.33 & 1.67 & 2.09 & 2.20 \\
+10.000 $\to$ 20.000 & 1.18 & 3.86 & 3.81 & 1.94 & 2.05 & 1.93 \\
+50.000 $\to$ 100.000 & 2.84 & 4.07 & 3.97 & 2.02 & 2.11 & 1.95 \\
+100.000 $\to$ 200.000 & 1.33 & 3.85 & 3.92 & 2.12 & 2.15 & 2.13 \\
+500.000 $\to$ 1.000.000 & 1.78 & 3.96 & {--} & 2.05 & 2.04 & {--} \\
+\midrule
+Esperada (teoria) & 2.0 & 4.0 & 4.0 & {$\approx 2{,}1$} & {$\approx 2{,}1$} & {$\approx 2{,}1$} \\
+\bottomrule
+\end{tabular}

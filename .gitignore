@@ -16,3 +16,20 @@ saida/
 
 # Metadados do Windows (arquivos baixados no WSL)
 *:Zone.Identifier
+
+# Arquivos auxiliares do LaTeX
+docs/*.aux
+docs/*.bbl
+docs/*.blg
+docs/*.brf
+docs/*.fdb_latexmk
+docs/*.fls
+docs/*.idx
+docs/*.ilg
+docs/*.ind
+docs/*.lof
+docs/*.log
+docs/*.lot
+docs/*.loq
+docs/*.out
+docs/*.toc
