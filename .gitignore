@@ -33,3 +33,4 @@ docs/*.lot
 docs/*.loq
 docs/*.out
 docs/*.toc
+docs/*.synctex.gz

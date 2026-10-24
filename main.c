@@ -25,7 +25,7 @@ const int cenarios_a_rodar[] = {2};
 
 // tamanhos:   0 = 1000,   1 = 2000,   2 = 5000,   3 = 10000,  4 = 20000,
 //             5 = 50000,  6 = 100000, 7 = 200000, 8 = 500000, 9 = 1000000
-const int tamanhos_a_rodar[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+const int tamanhos_a_rodar[] = {9};
 // =======================================================================
 
 double medir(void (*funcao) (int[], int), int v[], int n) {
