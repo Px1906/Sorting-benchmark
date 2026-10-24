@@ -106,7 +106,7 @@ def tabelas_estatisticas(r):
             linhas = [
                 r"\begin{tabular}{r " + formatos + " r}",
                 r"\toprule",
-                r"{$n$} & {Média} & {Desvio padrão} & {IC 95\,\% ($\pm$)}"
+                r"{$n$} & {Média} & {\cabecalho{Desvio\\padrão}} & {\cabecalho{IC 95\,\%\\($\pm$)}}"
                 r" & {Mínimo} & {Máximo} & {Rep.} \\",
                 r"\midrule",
             ]
@@ -173,8 +173,8 @@ def comparacao(df, r):
         linhas = [
             r"\begin{tabular}{r " + formatos + " c c}",
             r"\toprule",
-            r"{$n$} & {Insertion (ms)} & {Merge (ms)} & {Razão I/M}"
-            r" & {IC se sobrepõem?} & {Diferença significativa?} \\",
+            r"{$n$} & {\cabecalho{Insertion\\(ms)}} & {\cabecalho{Merge\\(ms)}} & {\cabecalho{Razão\\I/M}}"
+            r" & \cabecalho{IC se\\sobrepõem?} & \cabecalho{Diferença\\significativa?} \\",
             r"\midrule",
         ]
         linhas += [" & ".join(c) + r" \\" for c in corpo]
@@ -221,7 +221,7 @@ def razao_dobro(r):
             regras.append(rf"\cmidrule(lr){{{inicio}-{inicio + k - 1}}}")
             inicio += k
     linhas.append("".join(regras))
-    linhas.append(r"{$n \to 2n$} & " + " & ".join("{" + NOME_CEN[c].capitalize() + "}" for _, c in colunas) + r" \\")
+    linhas.append(r"{$n \to 2n$} & " + " & ".join(r"{\cabecalho{" + NOME_CEN[c].capitalize().replace(" ", r"\\") + "}}" for _, c in colunas) + r" \\")
     linhas.append(r"\midrule")
     for n in pares:
         valores = []
@@ -279,9 +279,9 @@ def regressoes(r):
     linhas_csv = []
     for alg in ALGORITMOS:
         linhas = [
-            r"\begin{tabular}{l l l S[table-format=1.6]}",
+            r"\begin{tabular}{l l S[table-format=1.6]}",
             r"\toprule",
-            r"Cenário & Modelo & {Função obtida, $T(n)$ em segundos} & {$R^2$} \\",
+            r"Modelo & {Função obtida, $T(n)$ em segundos} & {$R^2$} \\",
             r"\midrule",
         ]
         primeira = True
@@ -292,16 +292,17 @@ def regressoes(r):
             if not primeira:
                 linhas.append(r"\midrule")
             primeira = False
+            linhas.append(rf"\multicolumn{{3}}{{l}}{{\textit{{{NOME_CEN[cen].capitalize()}}}}} \\")
             for g in GRAUS:
                 coef_x, r2 = analise.regressao(r, alg, cen, g)
                 cn = coef_em_n(coef_x)
-                linhas.append(f"{NOME_CEN[cen].capitalize()} & Grau {g} & "
+                linhas.append(f"\\quad Grau {g} & "
                               f"{latex_polinomio(cn)} & {r2:.6f} \\\\")
                 linhas_csv.append({"algoritmo": alg, "cenario": cen, "modelo": f"grau {g}",
                                    "coeficientes_n": [float(c) for c in cn], "R2": r2})
             if alg == "merge":
                 (a, b), r2 = ajuste_nlogn(d)
-                linhas.append(f"{NOME_CEN[cen].capitalize()} & $n\\log_2 n$ & "
+                linhas.append("\\quad $n\\log_2 n$ & "
                               rf"$\num{{{cientifico(a)}}}\,n\log_2 n "
                               rf"{'-' if b < 0 else '+'} \num{{{cientifico(abs(b))}}}$ & {r2:.6f} \\")
                 linhas_csv.append({"algoritmo": alg, "cenario": cen, "modelo": "n log2 n",

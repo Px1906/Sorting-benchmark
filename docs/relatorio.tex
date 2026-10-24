@@ -20,7 +20,8 @@
 \usepackage{indentfirst}
 \usepackage{xcolor}
 \usepackage{graphicx}
-\usepackage{microtype}
+% protrusion=false: sem pontuação avançando na margem, para respeitar as margens da NBR 14724 à risca
+\usepackage[protrusion=false]{microtype}
 \usepackage{booktabs}
 \usepackage{siunitx}
 \usepackage{amsmath}
@@ -74,11 +75,17 @@
     columns      = fullflexible,
     keepspaces   = true,
     showstringspaces = false,
+    % a moldura é desenhada fora da caixa do código; recua o código para ela caber na margem
+    xleftmargin  = \dimexpr\fboxsep+\fboxrule\relax,
+    xrightmargin = \dimexpr\fboxsep+\fboxrule\relax,
     inputencoding = utf8,
     extendedchars = true,
     literate = {á}{{\'a}}1 {ã}{{\~a}}1 {ç}{{\c c}}1 {é}{{\'e}}1 {ê}{{\^e}}1
                {í}{{\'i}}1 {ó}{{\'o}}1 {õ}{{\~o}}1 {ú}{{\'u}}1 {×}{{$\times$}}1,
 }
+
+% Cabeçalho de tabela em mais de uma linha, alinhado pela base: \cabecalho{Desvio\\padrão}
+\newcommand{\cabecalho}[1]{\begin{tabular}[b]{@{}c@{}}#1\end{tabular}}
 
 % Marca itens que ainda precisam ser completados antes da entrega
 \newcommand{\pendente}[1]{\textcolor{red}{\textbf{[PENDENTE: #1]}}}
@@ -108,6 +115,12 @@
     urlcolor    = black,
     bookmarksdepth = 4,
 }
+
+% NBR 14724: margens de 3 cm (sup.) e 2 cm (inf.). O \checkandfixthelayout padrão
+% arredonda a altura do texto para um número inteiro de linhas, para cima, e a
+% margem inferior caía para 1,82 cm; [fixed] mantém a altura exata
+\setulmarginsandblock{3cm}{2cm}{*}
+\checkandfixthelayout[fixed]
 
 % NBR 14724: só o número da página, no canto superior direito
 \makeevenhead{abntheadings}{}{}{\ABNTEXfontereduzida\thepage}
@@ -201,7 +214,7 @@ Os experimentos foram executados em um computador com as especificações do \au
     \fonte{Elaborado pelo autor (2026).}
 \end{quadro}
 
-O programa foi compilado pelo \texttt{Makefile} do projeto com o comando \texttt{gcc -Wall -Wextra -O2 main.c sorts.c -o main}. As opções \texttt{-Wall} e \texttt{-Wextra} apenas habilitam avisos do compilador e não alteram o código gerado. A opção \texttt{-O2} habilita o conjunto de otimizações do GCC que não envolvem uma troca entre espaço e velocidade \cite{gcc2025}. Ela foi escolhida porque representa a forma como programas em C costumam ser compilados para uso real. As otimizações reduzem as constantes multiplicativas do tempo de execução, mas não alteram o número de comparações e movimentações que cada algoritmo realiza; portanto, não alteram a ordem de crescimento. Os tempos absolutos seriam outros com \texttt{-O0} ou \texttt{-O3}, mas as razões entre tamanhos de entrada e os expoentes analisados no \autoref{cap:analise} devem se manter.
+O programa foi compilado pelo \texttt{Makefile} do projeto com o comando \texttt{gcc -Wall -Wextra -O2 main.c sorts.c -o main}. As opções \texttt{-Wall} e \texttt{-Wextra} apenas habilitam avisos do compilador e não alteram o código gerado. A opção \texttt{-O2} habilita quase todas as otimizações do GCC que não envolvem uma troca entre espaço e velocidade \cite{gcc2025}. Ela foi escolhida porque representa a forma como programas em C costumam ser compilados para uso real. As otimizações reduzem as constantes multiplicativas do tempo de execução, mas não alteram o número de comparações e movimentações que cada algoritmo realiza; portanto, não alteram a ordem de crescimento. Os tempos absolutos seriam outros com \texttt{-O0} ou \texttt{-O3}, mas as razões entre tamanhos de entrada e os expoentes analisados no \autoref{cap:analise} devem se manter.
 
 Durante as execuções, o computador foi utilizado normalmente, sem isolamento de núcleos de processamento nem desativação do ajuste dinâmico de frequência do processador. Esses fatores, somados à camada de virtualização do WSL 2, são fontes de variação entre as repetições e foram considerados na análise da variabilidade (\autoref{sec:variabilidade}).
 
@@ -237,7 +250,7 @@ Para garantir que os dois algoritmos ordenassem exatamente o mesmo vetor em cada
 
 Para cada combinação de algoritmo, cenário e tamanho $n \in \{\num{1000},\allowbreak \num{2000},\allowbreak \num{5000},\allowbreak \num{10000},\allowbreak \num{20000},\allowbreak \num{50000},\allowbreak \num{100000},\allowbreak \num{200000},\allowbreak \num{500000},\allowbreak \num{1000000}\}$, foram realizadas 50 repetições consecutivas. O laço principal percorre os cenários, depois os tamanhos e, para cada tamanho, executa as 50 repetições de um algoritmo e em seguida as 50 do outro, reaproveitando um único vetor alocado por tamanho. O bloco de configuração no início do \texttt{main.c} permite selecionar quais algoritmos, cenários e tamanhos executar, o que permitiu realizar a coleta em várias execuções, entre 21 e 24 de outubro de 2026.
 
-Cada combinação gera um arquivo CSV próprio, no caminho \texttt{resultados/\allowbreak<algoritmo>/\allowbreak<cenário>/\allowbreak<n>.csv}, por exemplo \texttt{resultados/\allowbreak merge/\allowbreak medio/\allowbreak 0100000.csv}. Cada arquivo tem um cabeçalho e uma linha por repetição, com os campos \texttt{algoritmo}, \texttt{cenario}, \texttt{n}, \texttt{repeticao} e \texttt{tempo\_s}.
+Cada combinação gera um arquivo CSV próprio, no caminho \texttt{resultados/\allowbreak<algoritmo>/\allowbreak<cenário>/\allowbreak<n>.csv}. Os tempos do Merge Sort no caso médio com $n = \num{100000}$, por exemplo, ficam em \texttt{resultados/\allowbreak merge/\allowbreak medio/\allowbreak 0100000.csv}. Cada arquivo tem um cabeçalho e uma linha por repetição, com os campos \texttt{algoritmo}, \texttt{cenario}, \texttt{n}, \texttt{repeticao} e \texttt{tempo\_s}.
 
 \section{Estatística descritiva}
 \label{sec:estatistica}
