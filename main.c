@@ -21,11 +21,11 @@ const int tamanhos_vetor[] = {1000, 2000, 5000, 10000, 20000, 50000, 100000, 200
 const int algoritmos_a_rodar[] = {0, 1};
 
 // cenarios:   0 = melhor, 1 = medio, 2 = pior
-const int cenarios_a_rodar[] = {2};
+const int cenarios_a_rodar[] = {0, 1, 2};
 
 // tamanhos:   0 = 1000,   1 = 2000,   2 = 5000,   3 = 10000,  4 = 20000,
 //             5 = 50000,  6 = 100000, 7 = 200000, 8 = 500000, 9 = 1000000
-const int tamanhos_a_rodar[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+const int tamanhos_a_rodar[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 // =======================================================================
 
 double medir(void (*funcao) (int[], int), int v[], int n) {
@@ -42,21 +42,18 @@ void preencher_aleatorio(int *v, int n) {
     }
 }
 
-// Melhor caso: 1, 2, 3, ..., n
 void preencher_crescente(int *v, int n) {
     for (int k = 0; k < n; k++) {
         v[k] = k + 1;
     }
 }
 
-// Pior caso: n, n-1, ..., 1
 void preencher_decrescente(int *v, int n) {
     for (int k = 0; k < n; k++) {
         v[k] = n - k;
     }
 }
 
-// Preenche o vetor de acordo com o cenário (0 = melhor, 1 = medio, 2 = pior)
 void preencher(int c, int *v, int n) {
     switch (c) {
     case 0:

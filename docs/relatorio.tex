@@ -20,7 +20,8 @@
 \usepackage{indentfirst}
 \usepackage{xcolor}
 \usepackage{graphicx}
-\usepackage{microtype}
+% protrusion=false: sem pontuação avançando na margem, para respeitar as margens da NBR 14724 à risca
+\usepackage[protrusion=false]{microtype}
 \usepackage{booktabs}
 \usepackage{siunitx}
 \usepackage{amsmath}
@@ -74,18 +75,24 @@
     columns      = fullflexible,
     keepspaces   = true,
     showstringspaces = false,
+    % a moldura é desenhada fora da caixa do código; recua o código para ela caber na margem
+    xleftmargin  = \dimexpr\fboxsep+\fboxrule\relax,
+    xrightmargin = \dimexpr\fboxsep+\fboxrule\relax,
     inputencoding = utf8,
     extendedchars = true,
     literate = {á}{{\'a}}1 {ã}{{\~a}}1 {ç}{{\c c}}1 {é}{{\'e}}1 {ê}{{\^e}}1
                {í}{{\'i}}1 {ó}{{\'o}}1 {õ}{{\~o}}1 {ú}{{\'u}}1 {×}{{$\times$}}1,
 }
 
+% Cabeçalho de tabela em mais de uma linha, alinhado pela base: \cabecalho{Desvio\\padrão}
+\newcommand{\cabecalho}[1]{\begin{tabular}[b]{@{}c@{}}#1\end{tabular}}
+
 % Marca itens que ainda precisam ser completados antes da entrega
 \newcommand{\pendente}[1]{\textcolor{red}{\textbf{[PENDENTE: #1]}}}
 
 % ─── Dados do trabalho ──────────────────────────────
 \titulo{Análise empírica do Insertion Sort e do Merge Sort: tempos de execução, estatística descritiva e regressão polinomial}
-\autor{\pendente{nome completo do aluno}}
+\autor{Sérgio de Paiva Ximenes Filho}
 \local{Fortaleza}
 \data{2026}
 \orientador{Prof. Bruno Lopes}
@@ -108,6 +115,12 @@
     urlcolor    = black,
     bookmarksdepth = 4,
 }
+
+% NBR 14724: margens de 3 cm (sup.) e 2 cm (inf.). O \checkandfixthelayout padrão
+% arredonda a altura do texto para um número inteiro de linhas, para cima, e a
+% margem inferior caía para 1,82 cm; [fixed] mantém a altura exata
+\setulmarginsandblock{3cm}{2cm}{*}
+\checkandfixthelayout[fixed]
 
 % NBR 14724: só o número da página, no canto superior direito
 \makeevenhead{abntheadings}{}{}{\ABNTEXfontereduzida\thepage}
@@ -133,7 +146,7 @@
 
 \setlength{\absparsep}{18pt}
 \begin{resumo}
-Este relatório apresenta uma análise empírica do tempo de execução dos algoritmos de ordenação Insertion Sort e Merge Sort, implementados na linguagem C, com o objetivo de verificar se o comportamento observado na prática confirma as ordens de crescimento previstas pela análise assintótica. Os dois algoritmos foram executados sobre vetores de \num{1000} a \num{1000000} elementos em três cenários de entrada (crescente, aleatório e decrescente), com 50 repetições por combinação e medição de tempo pela função \texttt{clock\_gettime()} com o relógio \texttt{CLOCK\_MONOTONIC}. Para cada combinação foram calculados média, desvio padrão, intervalo de confiança de 95\,\%, mínimo e máximo, e foram ajustados polinômios de grau 1 a 3 às médias pelo método dos mínimos quadrados. Os resultados confirmaram o comportamento quadrático do Insertion Sort nos casos médio e pior (expoentes empíricos de 1,96 e 1,97, razão próxima de 4 ao dobrar $n$ e coeficiente de determinação de 0,999999 para o polinômio de grau 2), o comportamento linear do Insertion Sort no melhor caso e o crescimento quase linear do Merge Sort, compatível com $\Theta(n \log n)$. O Merge Sort foi significativamente mais rápido que o Insertion Sort em todos os tamanhos testados nos casos médio e pior, chegando a ser cerca de 632 vezes mais rápido com $n = \num{1000000}$ no caso médio, enquanto o Insertion Sort foi o mais rápido em todos os tamanhos do melhor caso. Conclui-se que a análise empírica confirmou as previsões teóricas e evidenciou aspectos que a notação assintótica omite, como as constantes multiplicativas e a sensibilidade de cada algoritmo à configuração da entrada.
+Este relatório apresenta uma análise empírica do tempo de execução dos algoritmos de ordenação Insertion Sort e Merge Sort, implementados na linguagem C, com o objetivo de verificar se o comportamento observado na prática confirma as ordens de crescimento previstas pela análise assintótica. Os dois algoritmos foram executados sobre vetores de \num{1000} a \num{1000000} elementos em três cenários de entrada (crescente, aleatório e decrescente), com 50 repetições por combinação e medição de tempo pela função \texttt{clock\_gettime()} com o relógio \texttt{CLOCK\_MONOTONIC}. Para cada combinação foram calculados média, desvio padrão, intervalo de confiança de 95\,\%, mínimo e máximo, e foram ajustados polinômios de grau 1 a 3 às médias pelo método dos mínimos quadrados. Os resultados confirmaram o comportamento quadrático do Insertion Sort nos casos médio e pior (expoentes empíricos de 1,96 e 1,99, razão próxima de 4 ao dobrar $n$ e coeficiente de determinação de 0,999999 para o polinômio de grau 2), o comportamento linear do Insertion Sort no melhor caso e o crescimento quase linear do Merge Sort, compatível com $\Theta(n \log n)$. O Merge Sort foi significativamente mais rápido que o Insertion Sort em todos os tamanhos testados nos casos médio e pior, chegando a ser cerca de 632 vezes mais rápido com $n = \num{1000000}$ no caso médio, enquanto o Insertion Sort foi o mais rápido em todos os tamanhos do melhor caso. Conclui-se que a análise empírica confirmou as previsões teóricas e evidenciou aspectos que a notação assintótica omite, como as constantes multiplicativas e a sensibilidade de cada algoritmo à configuração da entrada.
 
 \textbf{Palavras-chave}: algoritmos de ordenação; insertion sort; merge sort; análise empírica; regressão polinomial.
 \end{resumo}
@@ -190,8 +203,8 @@ Os experimentos foram executados em um computador com as especificações do \au
     \begin{tabular}{|l|p{9.5cm}|}
         \hline
         \textbf{Item} & \textbf{Especificação} \\ \hline
-        Processador & Intel Core i5-12400 (12.ª geração), 6 núcleos e 12 \textit{threads}, cache L2 de 7,5 MiB e L3 de 18 MiB \\ \hline
-        Memória RAM & 15,5 GiB disponíveis para a máquina virtual do WSL 2; \pendente{informar a RAM física total do computador} \\ \hline
+        Processador & Intel Core i5-12400 (12.ª geração), frequência base de 2,5 GHz, 6 núcleos e 12 \textit{threads}, cache L2 de 7,5 MiB e L3 de 18 MiB \\ \hline
+        Memória RAM & 32 GB instalados (31,8 GB utilizáveis pelo Windows), dos quais 15,5 GiB disponíveis para a máquina virtual do WSL 2 \\ \hline
         Sistema hospedeiro & Microsoft Windows 11 (versão 10.0.26200) \\ \hline
         Sistema de execução & Ubuntu 26.04.1 LTS no Windows Subsystem for Linux 2 (WSL 2), núcleo Linux 6.18.33.2-microsoft-standard-WSL2 \\ \hline
         Compilador & GCC 15.2.0 \\ \hline
@@ -201,7 +214,7 @@ Os experimentos foram executados em um computador com as especificações do \au
     \fonte{Elaborado pelo autor (2026).}
 \end{quadro}
 
-O programa foi compilado pelo \texttt{Makefile} do projeto com o comando \texttt{gcc -Wall -Wextra -O2 main.c sorts.c -o main}. As opções \texttt{-Wall} e \texttt{-Wextra} apenas habilitam avisos do compilador e não alteram o código gerado. A opção \texttt{-O2} habilita o conjunto de otimizações do GCC que não envolvem uma troca entre espaço e velocidade \cite{gcc2025}. Ela foi escolhida porque representa a forma como programas em C costumam ser compilados para uso real. As otimizações reduzem as constantes multiplicativas do tempo de execução, mas não alteram o número de comparações e movimentações que cada algoritmo realiza; portanto, não alteram a ordem de crescimento. Os tempos absolutos seriam outros com \texttt{-O0} ou \texttt{-O3}, mas as razões entre tamanhos de entrada e os expoentes analisados no \autoref{cap:analise} devem se manter.
+O programa foi compilado pelo \texttt{Makefile} do projeto com o comando \texttt{gcc -Wall -Wextra -O2 main.c sorts.c -o main}. As opções \texttt{-Wall} e \texttt{-Wextra} apenas habilitam avisos do compilador e não alteram o código gerado. A opção \texttt{-O2} habilita quase todas as otimizações do GCC que não envolvem uma troca entre espaço e velocidade \cite{gcc2025}. Ela foi escolhida porque representa a forma como programas em C costumam ser compilados para uso real. As otimizações reduzem as constantes multiplicativas do tempo de execução, mas não alteram o número de comparações e movimentações que cada algoritmo realiza; portanto, não alteram a ordem de crescimento. Os tempos absolutos seriam outros com \texttt{-O0} ou \texttt{-O3}, mas as razões entre tamanhos de entrada e os expoentes analisados no \autoref{cap:analise} devem se manter.
 
 Durante as execuções, o computador foi utilizado normalmente, sem isolamento de núcleos de processamento nem desativação do ajuste dinâmico de frequência do processador. Esses fatores, somados à camada de virtualização do WSL 2, são fontes de variação entre as repetições e foram considerados na análise da variabilidade (\autoref{sec:variabilidade}).
 
@@ -235,11 +248,9 @@ Para garantir que os dois algoritmos ordenassem exatamente o mesmo vetor em cada
 
 \section{Coleta e organização dos dados}
 
-Para cada combinação de algoritmo, cenário e tamanho $n \in \{\num{1000},\allowbreak \num{2000},\allowbreak \num{5000},\allowbreak \num{10000},\allowbreak \num{20000},\allowbreak \num{50000},\allowbreak \num{100000},\allowbreak \num{200000},\allowbreak \num{500000},\allowbreak \num{1000000}\}$, foram realizadas 50 repetições consecutivas. O laço principal percorre os cenários, depois os tamanhos e, para cada tamanho, executa as 50 repetições de um algoritmo e em seguida as 50 do outro, reaproveitando um único vetor alocado por tamanho. O bloco de configuração no início do \texttt{main.c} permite selecionar quais algoritmos, cenários e tamanhos executar, o que permitiu realizar a coleta em várias execuções, entre 21 e 22 de outubro de 2026.
+Para cada combinação de algoritmo, cenário e tamanho $n \in \{\num{1000},\allowbreak \num{2000},\allowbreak \num{5000},\allowbreak \num{10000},\allowbreak \num{20000},\allowbreak \num{50000},\allowbreak \num{100000},\allowbreak \num{200000},\allowbreak \num{500000},\allowbreak \num{1000000}\}$, foram realizadas 50 repetições consecutivas. O laço principal percorre os cenários, depois os tamanhos e, para cada tamanho, executa as 50 repetições de um algoritmo e em seguida as 50 do outro, reaproveitando um único vetor alocado por tamanho. O bloco de configuração no início do \texttt{main.c} permite selecionar quais algoritmos, cenários e tamanhos executar, o que permitiu realizar a coleta em várias execuções, entre 21 e 24 de outubro de 2026.
 
-Cada combinação gera um arquivo CSV próprio, no caminho \texttt{resultados/\allowbreak<algoritmo>/\allowbreak<cenário>/\allowbreak<n>.csv}, por exemplo \texttt{resultados/\allowbreak merge/\allowbreak medio/\allowbreak 0100000.csv}. Cada arquivo tem um cabeçalho e uma linha por repetição, com os campos \texttt{algoritmo}, \texttt{cenario}, \texttt{n}, \texttt{repeticao} e \texttt{tempo\_s}.
-
-Até a redação desta versão do relatório, duas combinações estavam incompletas: o arquivo do Insertion Sort no caso médio com $n = \num{100000}$ registra 46 das 50 repetições, devido a uma execução interrompida; e o pior caso com $n = \num{1000000}$ ainda não havia sido executado para nenhum dos algoritmos. \pendente{completar as 50 repetições do Insertion Sort no caso médio com $n = \num{100000}$ e executar o pior caso com $n = \num{1000000}$; depois, gerar os recursos novamente e revisar os trechos marcados nos capítulos \ref{cap:resultados}, \ref{cap:analise} e \ref{cap:conclusao}}
+Cada combinação gera um arquivo CSV próprio, no caminho \texttt{resultados/\allowbreak<algoritmo>/\allowbreak<cenário>/\allowbreak<n>.csv}. Os tempos do Merge Sort no caso médio com $n = \num{100000}$, por exemplo, ficam em \texttt{resultados/\allowbreak merge/\allowbreak medio/\allowbreak 0100000.csv}. Cada arquivo tem um cabeçalho e uma linha por repetição, com os campos \texttt{algoritmo}, \texttt{cenario}, \texttt{n}, \texttt{repeticao} e \texttt{tempo\_s}.
 
 \section{Estatística descritiva}
 \label{sec:estatistica}
@@ -333,7 +344,7 @@ Este capítulo apresenta os dados coletados, sem interpretação. As tabelas \re
 
 \section{Gráficos comparativos}
 
-As figuras \ref{fig:comp-melhor} a \ref{fig:comp-pior} mostram, para cada cenário, o tempo médio de execução de cada algoritmo em função de $n$, com barras de erro correspondentes ao intervalo de confiança de 95\,\%. Como os tempos variam ao longo de até seis ordens de grandeza, o eixo vertical está em escala logarítmica.
+As figuras \ref{fig:comp-melhor} a \ref{fig:comp-pior} mostram, para cada cenário, o tempo médio de execução de cada algoritmo em função de $n$, com barras de erro correspondentes ao intervalo de confiança de 95\,\%. Como os tempos variam ao longo de mais de seis ordens de grandeza, o eixo vertical está em escala logarítmica.
 
 \begin{figure}[H]
     \caption{Tempo médio de execução no melhor caso (vetor crescente)}
@@ -359,13 +370,11 @@ As figuras \ref{fig:comp-melhor} a \ref{fig:comp-pior} mostram, para cada cenár
     \fonte{Elaborada pelo autor (2026).}
 \end{figure}
 
-\pendente{a \autoref{fig:comp-pior} e as tabelas \ref{tab:est-insertion-pior} e \ref{tab:est-merge-pior} ainda não incluem $n = \num{1000000}$}
-
 % ═══════════════════════════════════════════════════
 \chapter{Análise}
 \label{cap:analise}
 
-Este capítulo interpreta os resultados do \autoref{cap:resultados} à luz da análise teórica dos algoritmos, respondendo às questões propostas no enunciado. As análises do pior caso consideram os tamanhos de \num{1000} a \num{500000}.
+Este capítulo interpreta os resultados do \autoref{cap:resultados} à luz da análise teórica dos algoritmos, respondendo às questões propostas no enunciado.
 
 \section{Ordens de crescimento observadas}
 \label{sec:ordens}
@@ -391,9 +400,9 @@ A \autoref{fig:loglog} reúne as seis séries em escala log-log, na qual uma fun
     \fonte{Elaborada pelo autor (2026).}
 \end{table}
 
-Os expoentes do Insertion Sort nos casos médio (1,960) e pior (1,973) são muito próximos de 2, e o do melhor caso (0,987) é muito próximo de 1, confirmando que o algoritmo é $\Theta(n^2)$ nos dois primeiros cenários e $\Theta(n)$ no último \cite{cormen2012}. A ligeira diferença em relação a 2 se explica pelos termos de ordem inferior, que pesam relativamente mais nos menores valores de $n$.
+Os expoentes do Insertion Sort nos casos médio (1,959) e pior (1,991) são muito próximos de 2, e o do melhor caso (0,987) é muito próximo de 1, confirmando que o algoritmo é $\Theta(n^2)$ nos dois primeiros cenários e $\Theta(n)$ no último \cite{cormen2012}. A ligeira diferença em relação a 2 se explica pelos termos de ordem inferior, que pesam relativamente mais nos menores valores de $n$.
 
-Para o Merge Sort, os expoentes ficaram entre 1,008 e 1,066, abaixo do valor de aproximadamente 1,10 que uma função exatamente proporcional a $n \log_2 n$ teria nesse intervalo. A diferença é pequena e indica que, nos menores tamanhos, custos que não crescem com $n \log n$, como as chamadas de função e as alocações de memória, pesam proporcionalmente mais e achatam a inclinação. Ainda assim, o crescimento é claramente muito inferior ao quadrático e compatível com $\Theta(n \log n)$. Como o fator $\log_2 n$ varia apenas de cerca de 10 para cerca de 20 em todo o intervalo estudado, distinguir com precisão $n \log n$ de $n$ exigiria tamanhos de entrada ainda maiores.
+Para o Merge Sort, os expoentes ficaram entre 1,004 e 1,066, abaixo do valor de aproximadamente 1,10 que uma função exatamente proporcional a $n \log_2 n$ teria nesse intervalo. A diferença é pequena e indica que, nos menores tamanhos, custos que não crescem com $n \log n$, como as chamadas de função e as alocações de memória, pesam proporcionalmente mais e achatam a inclinação. Ainda assim, o crescimento é claramente muito inferior ao quadrático e compatível com $\Theta(n \log n)$. Como o fator $\log_2 n$ varia apenas de cerca de 10 para cerca de 20 em todo o intervalo estudado, distinguir com precisão $n \log n$ de $n$ exigiria tamanhos de entrada ainda maiores.
 
 \section{Comportamento ao dobrar o tamanho da entrada}
 \label{sec:dobro}
@@ -409,13 +418,13 @@ A \autoref{tab:razao} mostra a razão $T(2n)/T(n)$ para os seis pares de tamanho
     \fonte{Elaborada pelo autor (2026).}
 \end{table}
 
-No Insertion Sort, nos casos médio e pior, as razões ficaram entre 3,53 e 4,33, oscilando em torno de 4, o valor esperado para um algoritmo quadrático: dobrar a entrada quadruplica o tempo, porque o número de deslocamentos é proporcional ao número de inversões do vetor, que é da ordem de $n^2$ \cite{knuth1998}. Os valores mais afastados de 4 ocorreram nos menores tamanhos ($\num{1000} \to \num{2000}$), em que os tempos são inferiores a 1\,ms e mais sensíveis a ruído e a efeitos de cache. Do par $\num{5000} \to \num{10000}$ em diante, todas as razões ficaram entre 3,81 e 4,33.
+No Insertion Sort, nos casos médio e pior, as razões ficaram entre 3,53 e 4,17, oscilando em torno de 4, o valor esperado para um algoritmo quadrático: dobrar a entrada quadruplica o tempo, porque o número de deslocamentos é proporcional ao número de inversões do vetor, que é da ordem de $n^2$ \cite{knuth1998}. Os valores mais afastados de 4 ocorreram nos menores tamanhos ($\num{1000} \to \num{2000}$), em que os tempos são inferiores a 1\,ms e mais sensíveis a ruído e a efeitos de cache. Do par $\num{5000} \to \num{10000}$ em diante, todas as razões ficaram entre 3,85 e 4,17.
 
 No melhor caso, as razões do Insertion Sort variaram bastante (de 1,18 a 2,84), embora em torno de 2, o valor esperado para crescimento linear. Essa irregularidade não contradiz a teoria: nesse cenário os tempos são da ordem de microssegundos (menos de 1\,ms mesmo com um milhão de elementos), de modo que pequenas perturbações do sistema têm grande efeito relativo, como mostra a \autoref{sec:variabilidade}.
 
-No Merge Sort, as razões ficaram entre 1,67 e 2,20 nos três cenários. A partir do par $\num{50000} \to \num{100000}$, todas ficaram entre 1,95 e 2,15, próximas do valor esperado, de aproximadamente 2,1. A razão ligeiramente superior a 2 é a assinatura do fator logarítmico: dobrar $n$ dobra o trabalho de cada nível de intercalação e acrescenta um nível à recursão.
+No Merge Sort, as razões ficaram entre 1,67 e 2,33 nos três cenários. A partir do par $\num{50000} \to \num{100000}$, todas ficaram entre 2,02 e 2,24, próximas do valor esperado, de aproximadamente 2,1. A razão ligeiramente superior a 2 é a assinatura do fator logarítmico: dobrar $n$ dobra o trabalho de cada nível de intercalação e acrescenta um nível à recursão.
 
-\pendente{incluir na análise o par $\num{500000} \to \num{1000000}$ do pior caso}
+No maior par medido, $\num{500000} \to \num{1000000}$, o comportamento se manteve nos três cenários. No pior caso, por exemplo, o tempo do Insertion Sort passou de 34,0\,s para 133,5\,s (razão de 3,92) e o do Merge Sort de 14,1\,ms para 31,7\,ms (razão de 2,24).
 
 \section{Comparação entre os algoritmos}
 \label{sec:comparacao}
@@ -449,11 +458,11 @@ As tabelas \ref{tab:comp-melhor} a \ref{tab:comp-pior} comparam os tempos médio
     \fonte{Elaborada pelo autor (2026).}
 \end{table}
 
-Em todos os 29 pares comparados, os intervalos de confiança não se sobrepõem e o teste de Welch rejeitou a igualdade das médias ($p < 10^{-12}$ em todos os casos). Assim, a diferença entre os algoritmos foi estatisticamente significativa em todos os tamanhos testados, em todos os cenários. O que muda entre os cenários é qual algoritmo é o mais rápido:
+Em todos os 30 pares comparados, os intervalos de confiança não se sobrepõem e o teste de Welch rejeitou a igualdade das médias ($p < 10^{-12}$ em todos os casos). Assim, a diferença entre os algoritmos foi estatisticamente significativa em todos os tamanhos testados, em todos os cenários. O que muda entre os cenários é qual algoritmo é o mais rápido:
 
 \begin{alineas}
-    \item \textbf{caso médio}: o Merge Sort já é mais rápido no menor tamanho testado, mas por pouco: com $n = \num{1000}$, o Insertion Sort leva 0,097\,ms e o Merge Sort 0,075\,ms (razão de 1,30). A vantagem do Merge Sort cresce rapidamente: a razão passa de 8,9 com $n = \num{10000}$ para 76 com $n = \num{100000}$ e 632 com $n = \num{1000000}$. Como a razão entre as duas funções teóricas é $n^2 / (n \log n) = n / \log n$, a vantagem do Merge Sort aumenta sem limite à medida que $n$ cresce;
-    \item \textbf{pior caso}: o Merge Sort é mais rápido em todos os tamanhos, já 5,4 vezes com $n = \num{1000}$, chegando a cerca de \num{2235} vezes com $n = \num{500000}$;
+    \item \textbf{caso médio}: o Merge Sort já é mais rápido no menor tamanho testado, mas por pouco: com $n = \num{1000}$, o Insertion Sort leva 0,097\,ms e o Merge Sort 0,075\,ms (razão de 1,30). A vantagem do Merge Sort cresce rapidamente: a razão passa de 8,9 com $n = \num{10000}$ para 73 com $n = \num{100000}$ e 632 com $n = \num{1000000}$. Como a razão entre as duas funções teóricas é $n^2 / (n \log n) = n / \log n$, a vantagem do Merge Sort aumenta sem limite à medida que $n$ cresce;
+    \item \textbf{pior caso}: o Merge Sort é mais rápido em todos os tamanhos, já 5,5 vezes com $n = \num{1000}$, chegando a cerca de \num{4219} vezes com $n = \num{1000000}$, em que o Insertion Sort leva 133,5\,s e o Merge Sort 31,7\,ms;
     \item \textbf{melhor caso}: o Insertion Sort é mais rápido em todos os tamanhos, executando entre 17 e 39 vezes mais rápido que o Merge Sort (razão I/M entre 0,026 e 0,059). Com o vetor já ordenado, o Insertion Sort apenas percorre o vetor fazendo uma comparação por elemento, em tempo $\Theta(n)$, enquanto o Merge Sort executa todas as divisões, cópias e intercalações, em tempo $\Theta(n \log n)$, independentemente da ordem da entrada.
 \end{alineas}
 
@@ -464,7 +473,7 @@ Portanto, nos tamanhos medidos, o Merge Sort foi mais rápido que o Insertion So
 
 O Insertion Sort é fortemente sensível à configuração da entrada. Com $n = \num{1000000}$, ordenar o vetor aleatório (66,8\,s) levou cerca de \num{80000} vezes mais tempo que ordenar o vetor crescente (0,83\,ms). Entre o pior caso e o caso médio, a razão entre os tempos se estabilizou em torno de 2 a partir de $n = \num{5000}$ (entre 1,94 e 2,11). Esse valor tem explicação teórica direta: o número de deslocamentos do Insertion Sort é igual ao número de inversões do vetor, que é $n(n-1)/2$ no vetor decrescente e, em média, $n(n-1)/4$ em um vetor aleatório \cite{knuth1998}, uma razão de exatamente 2.
 
-O Merge Sort, por outro lado, tem o mesmo número de níveis de recursão e de cópias em qualquer cenário, como prevê a análise $\Theta(n \log n)$ válida para todos os casos. De fato, os tempos do melhor caso e do pior caso foram praticamente iguais (razão entre 0,85 e 1,12). O caso médio, porém, foi cerca de 3,3 vezes mais lento que os outros dois a partir de $n = \num{20000}$. A diferença não altera a ordem de crescimento, mas mostra que as constantes dependem da entrada. Uma explicação plausível é que, com vetores já ordenados ou em ordem inversa, a intercalação esgota uma das metades rapidamente e realiza cerca de metade das comparações. Além disso, os resultados dessas comparações seguem um padrão regular, que o processador consegue prever. No vetor aleatório, o número de comparações é maior e seus resultados são imprevisíveis. Este experimento, no entanto, não mediu contagens de comparações nem eventos do processador para confirmar essa hipótese.
+O Merge Sort, por outro lado, tem o mesmo número de níveis de recursão e de cópias em qualquer cenário, como prevê a análise $\Theta(n \log n)$ válida para todos os casos. De fato, os tempos do melhor caso e do pior caso foram praticamente iguais (razão entre 0,83 e 1,10). O caso médio, porém, foi de 3,0 a 3,7 vezes mais lento que os outros dois a partir de $n = \num{20000}$, cerca de 3,3 vezes na maioria dos tamanhos. A diferença não altera a ordem de crescimento, mas mostra que as constantes dependem da entrada. Uma explicação plausível é que, com vetores já ordenados ou em ordem inversa, a intercalação esgota uma das metades rapidamente e realiza cerca de metade das comparações. Além disso, os resultados dessas comparações seguem um padrão regular, que o processador consegue prever. No vetor aleatório, o número de comparações é maior e seus resultados são imprevisíveis. Este experimento, no entanto, não mediu contagens de comparações nem eventos do processador para confirmar essa hipótese.
 
 \section{Variabilidade e intervalos de confiança}
 \label{sec:variabilidade}
@@ -526,22 +535,22 @@ As tabelas \ref{tab:reg-insertion} e \ref{tab:reg-merge} apresentam as funções
 
 \subsection{Insertion Sort}
 
-Nos casos médio e pior, o polinômio de grau 1 teve ajuste ruim ($R^2$ de 0,933 e 0,934), enquanto o de grau 2 se ajustou quase perfeitamente ($R^2$ de 0,999999 e 0,9999996). As funções obtidas foram:
+Nos casos médio e pior, o polinômio de grau 1 teve ajuste ruim ($R^2$ de 0,933 e 0,934), enquanto o de grau 2 se ajustou quase perfeitamente ($R^2$ de 0,999999 nos dois casos). As funções obtidas foram:
 
 \begin{align*}
-    T_{\text{médio}}(n) &\approx \num{6.635e-11}\, n^2 + \num{4.951e-7}\, n - \num{9.743e-3} \\
-    T_{\text{pior}}(n)  &\approx \num{1.331e-10}\, n^2 + \num{1.322e-7}\, n + \num{1.612e-3}
+    T_{\text{médio}}(n) &\approx \num{6.636e-11}\, n^2 + \num{4.822e-7}\, n - \num{1.216e-2} \\
+    T_{\text{pior}}(n)  &\approx \num{1.310e-10}\, n^2 + \num{2.571e-6}\, n - \num{4.566e-2}
 \end{align*}
 
-Essas funções têm a forma quadrática $T(n) = a n^2 + b n + c$ prevista pela teoria para o Insertion Sort \cite{cormen2012}, e o termo quadrático domina: com $n = \num{1000000}$, ele responde por mais de 99\,\% do valor da função. Os coeficientes também têm interpretação física. O coeficiente quadrático do pior caso ($\num{1.331e-10}$) é 2,01 vezes o do caso médio ($\num{6.635e-11}$), exatamente a razão entre $n^2/2$ e $n^2/4$ deslocamentos esperada pela contagem de inversões \cite{knuth1998}. Dividindo o tempo do caso médio com $n = \num{1000000}$ pelo número esperado de deslocamentos ($n^2/4$), obtém-se cerca de 0,27\,ns por deslocamento, o custo de uma iteração do laço interno nesta máquina. Os coeficientes linear e constante são pequenos, e o termo constante negativo do caso médio não tem significado físico: é apenas um artefato do ajuste, irrelevante diante do termo quadrático.
+Essas funções têm a forma quadrática $T(n) = a n^2 + b n + c$ prevista pela teoria para o Insertion Sort \cite{cormen2012}, e o termo quadrático domina: com $n = \num{1000000}$, ele responde por mais de 98\,\% do valor da função nos dois cenários. Os coeficientes também têm interpretação física. O coeficiente quadrático do pior caso ($\num{1.310e-10}$) é 1,97 vezes o do caso médio ($\num{6.636e-11}$), muito próximo da razão de 2 entre $n^2/2$ e $n^2/4$ deslocamentos esperada pela contagem de inversões \cite{knuth1998}. Dividindo o tempo do caso médio com $n = \num{1000000}$ pelo número esperado de deslocamentos ($n^2/4$), obtém-se cerca de 0,27\,ns por deslocamento, o custo de uma iteração do laço interno nesta máquina. Os coeficientes linear e constante são pequenos, e os termos constantes negativos não têm significado físico: são apenas artefatos do ajuste, irrelevantes diante do termo quadrático.
 
 No melhor caso, o polinômio de grau 1, $T(n) \approx \num{8.413e-10}\, n + \num{5.975e-6}$, já se ajustou bem ($R^2 = 0{,}9954$). Isso é compatível com o comportamento linear previsto, a cerca de 0,8\,ns por elemento. Os graus 2 e 3 aumentaram o $R^2$ apenas marginalmente (para 0,9971 e 0,9979), e o termo de maior grau ficou negativo nos dois casos, o que não tem significado físico para um tempo de execução: é típico de um ajuste que passa a acompanhar o ruído das medições, e não uma tendência real.
 
-O polinômio de grau 3 tem $R^2$ igual ou maior que o de grau 2 em todos os casos, por exemplo 1,000000 contra 0,999999 no caso médio. Isso, porém, não significa que o algoritmo tenha ordem de crescimento cúbica. Polinômios de grau maior contêm os de grau menor como caso particular: basta zerar o coeficiente adicional. Por isso, o ajuste por mínimos quadrados nunca piora quando se aumenta o grau, porque o termo extra sempre pode absorver parte do ruído. Com apenas dez pontos, um polinômio de grau suficientemente alto passaria exatamente por todos eles. O critério para escolher o modelo não deve ser apenas o maior $R^2$, e sim o menor grau que explica os dados com coeficientes coerentes. No Insertion Sort, o coeficiente cúbico obtido é desprezível e de sinal negativo ($-\num{1.146e-18}$ no caso médio), e o coeficiente quadrático praticamente não muda em relação ao ajuste de grau 2 ($\num{6.796e-11}$ contra $\num{6.635e-11}$). Isso mostra que o termo cúbico não representa uma tendência real dos dados. Portanto, o grau que melhor descreve o Insertion Sort é 2 nos casos médio e pior, e 1 no melhor caso, em concordância com a teoria.
+O polinômio de grau 3 tem $R^2$ igual ou maior que o de grau 2 em todos os casos, por exemplo 1,000000 contra 0,999999 no caso médio. Isso, porém, não significa que o algoritmo tenha ordem de crescimento cúbica. Polinômios de grau maior contêm os de grau menor como caso particular: basta zerar o coeficiente adicional. Por isso, o ajuste por mínimos quadrados nunca piora quando se aumenta o grau, porque o termo extra sempre pode absorver parte do ruído. Com apenas dez pontos, um polinômio de grau suficientemente alto passaria exatamente por todos eles. O critério para escolher o modelo não deve ser apenas o maior $R^2$, e sim o menor grau que explica os dados com coeficientes coerentes. No Insertion Sort, o coeficiente cúbico obtido é desprezível e de sinal negativo ($-\num{1.400e-18}$ no caso médio), e o coeficiente quadrático praticamente não muda em relação ao ajuste de grau 2 ($\num{6.834e-11}$ contra $\num{6.636e-11}$). Isso mostra que o termo cúbico não representa uma tendência real dos dados. Portanto, o grau que melhor descreve o Insertion Sort é 2 nos casos médio e pior, e 1 no melhor caso, em concordância com a teoria.
 
 \subsection{Merge Sort}
 
-Para o Merge Sort, todos os modelos obtiveram $R^2$ acima de 0,999, inclusive o de grau 1. No caso médio, o polinômio de grau 1 ($R^2 = 0{,}99975$) e o modelo $n \log_2 n$ ($R^2 = 0{,}99975$) tiveram ajustes praticamente idênticos:
+Para o Merge Sort, todos os modelos obtiveram $R^2$ acima de 0,997, inclusive o de grau 1. No caso médio, o polinômio de grau 1 ($R^2 = 0{,}99975$) e o modelo $n \log_2 n$ ($R^2 = 0{,}99975$) tiveram ajustes praticamente idênticos:
 
 \begin{align*}
     T_{\text{médio}}(n) &\approx \num{1.058e-7}\, n - \num{5.772e-4} && \text{(grau 1)} \\
@@ -550,23 +559,19 @@ Para o Merge Sort, todos os modelos obtiveram $R^2$ acima de 0,999, inclusive o 
 
 O polinômio de grau 2 melhorou um pouco o ajuste ($R^2 = 0{,}99992$), com coeficiente quadrático positivo e muito pequeno ($\num{5.350e-15}$). Esse termo não indica crescimento quadrático: ele aproxima a leve curvatura para cima que o fator $\log n$ produz em relação a uma reta. Com $n = \num{1000000}$, o termo quadrático corresponde a cerca de 5\,\% do valor da função, enquanto no Insertion Sort o termo quadrático corresponde a quase todo o tempo.
 
-A regressão polinomial é, portanto, consistente com o modelo teórico linearítmico. No entanto, nesse intervalo de tamanhos ela não consegue distinguir com clareza $n \log n$ de um crescimento linear. Como o fator $\log_2 n$ apenas dobra (de aproximadamente 10 para 20) enquanto $n$ é multiplicado por mil, as duas curvas são muito parecidas, e o ajuste por mínimos quadrados sobre as médias é dominado pelos maiores valores de $n$. No melhor caso, o modelo $n \log_2 n$ teve ajuste um pouco melhor que o linear ($R^2$ de 0,99981 contra 0,99972). No pior caso ocorreu o inverso (0,99906 contra 0,99986). As evidências mais claras do fator logarítmico são as razões ao dobrar $n$ ligeiramente acima de 2 (\autoref{sec:dobro}) e a grande diferença em relação ao comportamento quadrático do Insertion Sort, e não o $R^2$.
-
-\pendente{revisar as funções e os valores de $R^2$ do pior caso após incluir $n = \num{1000000}$}
+A regressão polinomial é, portanto, consistente com o modelo teórico linearítmico. No entanto, nesse intervalo de tamanhos ela não consegue distinguir com clareza $n \log n$ de um crescimento linear. Como o fator $\log_2 n$ apenas dobra (de aproximadamente 10 para 20) enquanto $n$ é multiplicado por mil, as duas curvas são muito parecidas, e o ajuste por mínimos quadrados sobre as médias é dominado pelos maiores valores de $n$. No melhor e no pior caso, o modelo $n \log_2 n$ teve ajuste um pouco melhor que o linear ($R^2$ de 0,99981 contra 0,99972 e de 0,99876 contra 0,99752, respectivamente), mas a diferença é pequena e está na mesma ordem da dispersão das medições: no pior caso com $n = \num{1000000}$, por exemplo, o coeficiente de variação do Merge Sort foi de 7,7\,\%. As evidências mais claras do fator logarítmico são as razões ao dobrar $n$ ligeiramente acima de 2 (\autoref{sec:dobro}) e a grande diferença em relação ao comportamento quadrático do Insertion Sort, e não o $R^2$.
 
 % ═══════════════════════════════════════════════════
 \chapter{Conclusão}
 \label{cap:conclusao}
 
-O experimento confirmou empiricamente as ordens de crescimento previstas pela análise teórica. O Insertion Sort apresentou crescimento quadrático nos casos médio e pior, com expoentes empíricos de 1,96 e 1,97, razão próxima de 4 ao dobrar $n$ e polinômio de grau 2 com $R^2$ de 0,999999, e crescimento linear no melhor caso. O Merge Sort apresentou crescimento quase linear nos três cenários, com razão próxima de 2,1 ao dobrar $n$, compatível com $\Theta(n \log n)$. A relação de 2 entre os coeficientes quadráticos do pior caso e do caso médio do Insertion Sort coincidiu com a razão entre os números de inversões dos vetores decrescente e aleatório, o que mostra que a regressão capturou não apenas a forma da função, mas também a contagem de operações que a teoria descreve.
+O experimento confirmou empiricamente as ordens de crescimento previstas pela análise teórica. O Insertion Sort apresentou crescimento quadrático nos casos médio e pior, com expoentes empíricos de 1,96 e 1,99, razão próxima de 4 ao dobrar $n$ e polinômio de grau 2 com $R^2$ de 0,999999, e crescimento linear no melhor caso. O Merge Sort apresentou crescimento quase linear nos três cenários, com razão próxima de 2,1 ao dobrar $n$, compatível com $\Theta(n \log n)$. A relação próxima de 2 (1,97) entre os coeficientes quadráticos do pior caso e do caso médio do Insertion Sort coincidiu com a razão entre os números de inversões dos vetores decrescente e aleatório, o que mostra que a regressão capturou não apenas a forma da função, mas também a contagem de operações que a teoria descreve.
 
-Na comparação entre os algoritmos, o Merge Sort foi significativamente mais rápido em todos os tamanhos testados nos casos médio e pior, com uma vantagem que cresceu de 1,3 vez com $n = \num{1000}$ para mais de 600 vezes com $n = \num{1000000}$ no caso médio. O Insertion Sort, por sua vez, foi de 17 a 39 vezes mais rápido no melhor caso. Esses resultados mostram que a escolha do algoritmo depende do tamanho e da configuração da entrada, e não apenas da ordem de crescimento.
+Na comparação entre os algoritmos, o Merge Sort foi significativamente mais rápido em todos os tamanhos testados nos casos médio e pior, com uma vantagem que cresceu de 1,3 vez com $n = \num{1000}$ para mais de 600 vezes com $n = \num{1000000}$ no caso médio e para mais de \num{4000} vezes no pior caso. O Insertion Sort, por sua vez, foi de 17 a 39 vezes mais rápido no melhor caso. Esses resultados mostram que a escolha do algoritmo depende do tamanho e da configuração da entrada, e não apenas da ordem de crescimento.
 
-O experimento também evidenciou o que a análise assintótica deixa de fora: as constantes multiplicativas, que tornam o Insertion Sort competitivo em entradas pequenas; a influência da configuração da entrada nas constantes do Merge Sort, cujo caso médio foi cerca de 3,3 vezes mais lento que os demais apesar da mesma ordem de crescimento; e a variabilidade das medições, que exigiu repetições e intervalos de confiança para que as conclusões fossem confiáveis. Também mostrou um limite do método: no intervalo estudado, o $R^2$ da regressão não foi suficiente para distinguir $n \log n$ de crescimento linear, e indicadores como a razão ao dobrar $n$ e o expoente empírico foram mais informativos. A análise teórica prevê como o custo cresce, e a análise empírica mostra quanto esse custo vale na prática e a partir de que ponto as previsões se tornam visíveis. As duas são complementares.
+O experimento também evidenciou o que a análise assintótica deixa de fora: as constantes multiplicativas, que tornam o Insertion Sort competitivo em entradas pequenas; a influência da configuração da entrada nas constantes do Merge Sort, cujo caso médio foi cerca de 3 vezes mais lento que os demais apesar da mesma ordem de crescimento; e a variabilidade das medições, que exigiu repetições e intervalos de confiança para que as conclusões fossem confiáveis. Também mostrou um limite do método: no intervalo estudado, o $R^2$ da regressão não foi suficiente para distinguir $n \log n$ de crescimento linear, e indicadores como a razão ao dobrar $n$ e o expoente empírico foram mais informativos. A análise teórica prevê como o custo cresce, e a análise empírica mostra quanto esse custo vale na prática e a partir de que ponto as previsões se tornam visíveis. As duas são complementares.
 
 Como trabalhos futuros, sugere-se medir tamanhos abaixo de \num{1000} para localizar o ponto de cruzamento entre os algoritmos no caso médio e contar comparações e movimentações, além do tempo, para verificar as explicações propostas para as diferenças entre cenários do Merge Sort.
-
-\pendente{revisar a conclusão após incluir o pior caso com $n = \num{1000000}$}
 
 % ─── PÓS-TEXTUAIS ──────────────────────────────────
 \postextual
